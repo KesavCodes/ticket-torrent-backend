@@ -6,6 +6,7 @@ import passport from "passport";
 import dotenv from "dotenv";
 
 import testRouter from "./routes/test.route";
+import dataLoadRouter from "./routes/dataLoad.route";
 
 import authRouter from "./routes/auth/index.auth.route";
 
@@ -16,6 +17,15 @@ import ticketRouter from "./routes/ticket.route";
 import requestRouter from "./routes/request.route";
 
 dotenv.config();
+
+const requiredProperty = [
+  process.env.COOKIE_SECRET_CODE,
+  process.env.SESSION_SECRET_CODE,
+];
+
+if (requiredProperty.some((property) => !property)) {
+  throw new Error("Add the required properties in the .env file");
+}
 
 type User = {
   id: string;
@@ -46,10 +56,10 @@ app.use(
   })
 );
 app.use(express.json());
-app.use(cookieParser("cookieSecretCode"));
+app.use(cookieParser(process.env.COOKIE_SECRET_CODE));
 app.use(
   expressSession({
-    secret: "sessionSecretCode",
+    secret: process.env.SESSION_SECRET_CODE!,
     saveUninitialized: false,
     resave: false,
     cookie: {
@@ -62,6 +72,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use("/test", testRouter);
+app.use("/dataLoad", dataLoadRouter);
 
 app.use("/auth", authRouter);
 

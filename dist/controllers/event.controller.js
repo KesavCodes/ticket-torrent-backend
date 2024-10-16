@@ -85,6 +85,10 @@ const getEventsBySearch = (req, res) => __awaiter(void 0, void 0, void 0, functi
                 cover: true,
                 city: true,
                 date: true,
+                address: true,
+                category: true,
+                hostedBy: true,
+                tags: true
             }, orderBy: {
                 createdAt: "desc",
             } }, (max && typeof Number(max) === "number" ? { take: Number(max) } : {})));
@@ -110,7 +114,7 @@ const addEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             data: null,
             message: "User need to be authorized to add events.",
         });
-    const { name, description, date, cover, cityId } = req.body;
+    const { name, description, date, cover, cityId, address, category, hostedBy, tags, } = req.body;
     try {
         const newEvent = yield clients_1.default.event.create({
             data: {
@@ -121,6 +125,10 @@ const addEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 date: new Date(date),
                 dateTime: new Date(date),
                 cityId,
+                address,
+                category,
+                hostedBy,
+                tags,
             },
         });
         return res

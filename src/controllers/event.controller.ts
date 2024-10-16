@@ -72,12 +72,17 @@ export const getEventsBySearch = async (req: Request, res: Response) => {
         cover: true,
         city: true,
         date: true,
+        address: true,
+        category: true,
+        hostedBy: true,
+        tags: true
       },
       orderBy: {
         createdAt: "desc",
       },
       ...(max && typeof Number(max) === "number" ? { take: Number(max) } : {}),
     });
+
     return res.json({
       data: eventsMatchingSearchCriteria,
       message: "Events retrieved successfully!",
@@ -98,7 +103,17 @@ export const addEvent = async (req: Request, res: Response) => {
       data: null,
       message: "User need to be authorized to add events.",
     });
-  const { name, description, date, cover, cityId } = req.body;
+  const {
+    name,
+    description,
+    date,
+    cover,
+    cityId,
+    address,
+    category,
+    hostedBy,
+    tags,
+  } = req.body;
   try {
     const newEvent = await prisma.event.create({
       data: {
@@ -109,6 +124,10 @@ export const addEvent = async (req: Request, res: Response) => {
         date: new Date(date),
         dateTime: new Date(date),
         cityId,
+        address,
+        category,
+        hostedBy,
+        tags,
       },
     });
     return res

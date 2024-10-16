@@ -38,15 +38,3 @@ export const localLogin = (req: Request, res: Response) => {
   console.log(req.user, "-- From: req.user");
   return res.status(200).json({ message: "User Logged in successfully" });
 };
-
-export const logout = (req: Request, res: Response) => {
-  if (!req.user)
-    return res.status(401).json({ message: "User not authenticated" });
-  req.logout((err) => {
-    if (err)
-      return res
-        .status(500)
-        .json({ message: "Something went wrong. Failed to logout user" });
-    return res.status(200).json({ message: "User logged out successfully" });
-  });
-};

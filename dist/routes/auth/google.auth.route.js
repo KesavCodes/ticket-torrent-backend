@@ -16,14 +16,5 @@ router.get("/callback", passport_1.default.authenticate("google", {
 router.get("/failure", (req, res) => {
     return res.status(400).send("Login failed. Try again!");
 });
-router.post("/logout", (req, res) => {
-    req.logout((err) => {
-        if (err)
-            return res
-                .status(500)
-                .json({ message: "Something went wrong. Failed to logout user" });
-        return res.status(200).json({ message: "User logged out successfully" });
-    });
-});
 exports.default = router;
 //# sourceMappingURL=google.auth.route.js.map

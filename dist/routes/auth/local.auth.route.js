@@ -11,6 +11,5 @@ const user_validation_1 = __importDefault(require("../../validations/user.valida
 const router = express_1.default.Router();
 router.post("/register", user_validation_1.default, local_auth_controller_1.localRegisterUser);
 router.post("/login", passport_1.default.authenticate("local"), local_auth_controller_1.localLogin);
-router.post("/logout", local_auth_controller_1.logout);
 exports.default = router;
 //# sourceMappingURL=local.auth.route.js.map
