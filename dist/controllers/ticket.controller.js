@@ -46,8 +46,14 @@ const getTicketById = (req, res) => __awaiter(void 0, void 0, void 0, function* 
 });
 exports.getTicketById = getTicketById;
 const addTicket = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const userId = "66cadfe32e878f6008ab9872";
-    const { eventId, price, quantity, status } = req.body;
+    var _a;
+    const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+    if (!userId)
+        return res.status(401).json({
+            data: null,
+            message: "User need to be authorized to add tickets.",
+        });
+    const { eventId, price, quantity, status, category } = req.body;
     try {
         const newTicket = yield clients_1.default.ticket.create({
             data: {
@@ -56,6 +62,7 @@ const addTicket = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 price,
                 quantity,
                 status,
+                category,
             },
         });
         return res
@@ -72,8 +79,14 @@ const addTicket = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.addTicket = addTicket;
 const updateTicket = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const userId = "66cadfe32e878f6008ab9872";
-    const { eventId, price, quantity, status } = req.body;
+    var _a;
+    const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+    if (!userId)
+        return res.status(401).json({
+            data: null,
+            message: "User need to be authorized to update tickets.",
+        });
+    const { eventId, price, quantity, status, category } = req.body;
     const { id } = req.params;
     try {
         const updatedEvent = yield clients_1.default.ticket.update({
@@ -84,6 +97,7 @@ const updateTicket = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 price,
                 quantity,
                 status,
+                category,
             },
         });
         return res.status(200).json({

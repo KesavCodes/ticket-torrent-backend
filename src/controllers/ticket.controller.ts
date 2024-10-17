@@ -31,8 +31,13 @@ export const getTicketById = async (req: Request, res: Response) => {
 };
 
 export const addTicket = async (req: Request, res: Response) => {
-  const userId = "66cadfe32e878f6008ab9872";
-  const { eventId, price, quantity, status } = req.body;
+  const userId = req.user?.id;
+  if (!userId)
+    return res.status(401).json({
+      data: null,
+      message: "User need to be authorized to add tickets.",
+    });
+  const { eventId, price, quantity, status, category } = req.body;
   try {
     const newTicket = await prisma.ticket.create({
       data: {
@@ -41,6 +46,7 @@ export const addTicket = async (req: Request, res: Response) => {
         price,
         quantity,
         status,
+        category,
       },
     });
     return res
@@ -56,8 +62,13 @@ export const addTicket = async (req: Request, res: Response) => {
 };
 
 export const updateTicket = async (req: Request, res: Response) => {
-  const userId = "66cadfe32e878f6008ab9872";
-  const { eventId, price, quantity, status } = req.body;
+  const userId = req.user?.id;
+  if (!userId)
+    return res.status(401).json({
+      data: null,
+      message: "User need to be authorized to update tickets.",
+    });
+  const { eventId, price, quantity, status, category } = req.body;
   const { id } = req.params;
   try {
     const updatedEvent = await prisma.ticket.update({
@@ -68,6 +79,7 @@ export const updateTicket = async (req: Request, res: Response) => {
         price,
         quantity,
         status,
+        category,
       },
     });
     return res.status(200).json({
