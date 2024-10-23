@@ -10,6 +10,6 @@ const local_auth_controller_1 = require("../../controllers/auth/local.auth.contr
 const user_validation_1 = __importDefault(require("../../validations/user.validation"));
 const router = express_1.default.Router();
 router.post("/register", user_validation_1.default, local_auth_controller_1.localRegisterUser);
-router.post("/login", passport_1.default.authenticate("local", { failureRedirect: '/auth/1' }), local_auth_controller_1.localLogin);
+router.post("/login", passport_1.default.authenticate("local"), local_auth_controller_1.localLogin);
 exports.default = router;
 //# sourceMappingURL=local.auth.route.js.map
