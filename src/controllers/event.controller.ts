@@ -28,7 +28,7 @@ export const getAllEvents = async (req: Request, res: Response) => {
 export const getEventById = async (req: Request, res: Response) => {
   const { eventId: id } = req.params;
   try {
-    const event = await prisma.event.findUnique({ where: { id } });
+    const event = await prisma.event.findUnique({ where: { id }, include: {tickets: true} });
     return res.json({ data: event, message: "Events retrieved successfully!" });
   } catch (err) {
     console.error(err);
@@ -40,6 +40,8 @@ export const getEventById = async (req: Request, res: Response) => {
 };
 
 export const getEventsBySearch = async (req: Request, res: Response) => {
+  const userId = req.user?.id;
+  console.log(userId, '----user id from event search')
   try {
     const { name, city, date, max } = req.query;
     const lowerDateRange = date

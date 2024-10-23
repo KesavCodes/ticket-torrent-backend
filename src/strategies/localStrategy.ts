@@ -5,10 +5,10 @@ import { comparePassword } from "../lib/hashHelper";
 
 export default passport.use(
   new Strategy(async (username, password, done) => {
-    console.log(username, "--> username");
+    console.log(username, "--> email");
     console.log(password, "--> password");
     try {
-      const findUser = await prisma.user.findUnique({ where: { username } });
+      const findUser = await prisma.user.findUnique({ where: { email:username } });
       if (!findUser || !comparePassword(password, findUser.password!))
         throw new Error("Invalid credentials!");
       const { password: removePassword, ...userData } = findUser;

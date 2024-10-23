@@ -42,7 +42,7 @@ exports.getAllEvents = getAllEvents;
 const getEventById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { eventId: id } = req.params;
     try {
-        const event = yield clients_1.default.event.findUnique({ where: { id } });
+        const event = yield clients_1.default.event.findUnique({ where: { id }, include: { tickets: true } });
         return res.json({ data: event, message: "Events retrieved successfully!" });
     }
     catch (err) {
@@ -55,6 +55,9 @@ const getEventById = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 });
 exports.getEventById = getEventById;
 const getEventsBySearch = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+    console.log(userId, '----user id from event search');
     try {
         const { name, city, date, max } = req.query;
         const lowerDateRange = date

@@ -31,15 +31,24 @@ const localRegisterUser = (req, res) => __awaiter(void 0, void 0, void 0, functi
     const errors = (0, express_validator_1.validationResult)(req);
     console.log(errors);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array().map((err, index) => `${index + 1}. ${err.msg}`) });
+        return res
+            .status(400)
+            .json({
+            errors: errors.array().map((err, index) => `${index + 1}. ${err.msg}`),
+        });
     }
     const { username, password, email } = req.body;
     try {
-        const existingUser = yield clients_1.default.user.findUnique({
-            where: { username: username },
+        const existingUserName = yield clients_1.default.user.findUnique({
+            where: { username },
         });
-        if (existingUser)
+        if (existingUserName)
             throw new Error("Username already in use");
+        const existingUserEmail = yield clients_1.default.user.findUnique({
+            where: { email },
+        });
+        if (existingUserEmail)
+            throw new Error("Email already in use");
         const hashedPassword = (0, hashHelper_1.hashPassword)(password);
         const _a = yield clients_1.default.user.create({
             data: { username, email, password: hashedPassword },
@@ -60,8 +69,11 @@ const localRegisterUser = (req, res) => __awaiter(void 0, void 0, void 0, functi
 });
 exports.localRegisterUser = localRegisterUser;
 const localLogin = (req, res) => {
+    var _a;
     console.log(req.user, "-- From: req.user");
-    return res.status(200).json({ message: "User Logged in successfully" });
+    return res
+        .status(200)
+        .json({ message: "User Logged in successfully", user: (_a = req.user) === null || _a === void 0 ? void 0 : _a.id });
 };
 exports.localLogin = localLogin;
 //# sourceMappingURL=local.auth.controller.js.map

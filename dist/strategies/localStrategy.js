@@ -28,10 +28,10 @@ const passport_local_1 = require("passport-local");
 const clients_1 = __importDefault(require("../lib/clients"));
 const hashHelper_1 = require("../lib/hashHelper");
 exports.default = passport_1.default.use(new passport_local_1.Strategy((username, password, done) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(username, "--> username");
+    console.log(username, "--> email");
     console.log(password, "--> password");
     try {
-        const findUser = yield clients_1.default.user.findUnique({ where: { username } });
+        const findUser = yield clients_1.default.user.findUnique({ where: { email: username } });
         if (!findUser || !(0, hashHelper_1.comparePassword)(password, findUser.password))
             throw new Error("Invalid credentials!");
         const { password: removePassword } = findUser, userData = __rest(findUser, ["password"]);

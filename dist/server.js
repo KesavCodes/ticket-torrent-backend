@@ -28,7 +28,7 @@ if (requiredProperty.some((property) => !property)) {
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 8080;
 app.use((0, cors_1.default)({
-    // origin: "http://localhost:3000",
+    origin: "http://localhost:5173",
     credentials: true, // Enables cookies for CORS
 }));
 app.use(express_1.default.json());

@@ -8,14 +8,22 @@ export const localRegisterUser = async (req: Request, res: Response) => {
   const errors = validationResult(req);
   console.log(errors);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array().map((err,index)=>`${index+1}. ${err.msg}`) });
+    return res
+      .status(400)
+      .json({
+        errors: errors.array().map((err, index) => `${index + 1}. ${err.msg}`),
+      });
   }
   const { username, password, email } = req.body;
   try {
-    const existingUser = await prisma.user.findUnique({
-      where: { username: username },
+    const existingUserName = await prisma.user.findUnique({
+      where: { username },
     });
-    if (existingUser) throw new Error("Username already in use");
+    if (existingUserName) throw new Error("Username already in use");
+    const existingUserEmail = await prisma.user.findUnique({
+      where: { email },
+    });
+    if (existingUserEmail) throw new Error("Email already in use");
     const hashedPassword = hashPassword(password);
     const { password: removePassword, ...newUser } = await prisma.user.create({
       data: { username, email, password: hashedPassword },
@@ -36,5 +44,7 @@ export const localRegisterUser = async (req: Request, res: Response) => {
 
 export const localLogin = (req: Request, res: Response) => {
   console.log(req.user, "-- From: req.user");
-  return res.status(200).json({ message: "User Logged in successfully" });
+  return res
+    .status(200)
+    .json({ message: "User Logged in successfully", user: req.user?.id });
 };
