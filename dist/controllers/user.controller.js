@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUser = exports.getUserById = exports.getAllUsers = void 0;
+exports.deleteUser = exports.getUserById = exports.getMyProfileDetail = exports.getAllUsers = void 0;
 const clients_1 = __importDefault(require("../lib/clients"));
 const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -30,6 +30,27 @@ const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.getAllUsers = getAllUsers;
+const getMyProfileDetail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const id = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+    if (!id)
+        return res.status(401).json({
+            data: null,
+            message: "User not authenticated.",
+        });
+    try {
+        const user = yield clients_1.default.user.findUnique({ where: { id } });
+        return res.json({ data: user, message: "User profile data retrieved successfully!" });
+    }
+    catch (err) {
+        console.error(err);
+        return res.status(500).json({
+            data: null,
+            message: "Something went wrong. Failed to retrieve user profile data!",
+        });
+    }
+});
+exports.getMyProfileDetail = getMyProfileDetail;
 const getUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     try {

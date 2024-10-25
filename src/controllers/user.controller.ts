@@ -16,6 +16,25 @@ export const getAllUsers = async (req: Request, res: Response) => {
   }
 };
 
+export const getMyProfileDetail = async (req: Request, res: Response) => {
+  const id = req.user?.id;
+  if (!id)
+    return res.status(401).json({
+      data: null,
+      message: "User not authenticated.",
+    });
+  try {
+    const user = await prisma.user.findUnique({ where: { id } });
+    return res.json({ data: user, message: "User profile data retrieved successfully!" });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      data: null,
+      message: "Something went wrong. Failed to retrieve user profile data!",
+    });
+  }
+};
+
 export const getUserById = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
