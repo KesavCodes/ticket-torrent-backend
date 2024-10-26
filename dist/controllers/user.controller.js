@@ -39,8 +39,31 @@ const getMyProfileDetail = (req, res) => __awaiter(void 0, void 0, void 0, funct
             message: "User not authenticated.",
         });
     try {
-        const user = yield clients_1.default.user.findUnique({ where: { id } });
-        return res.json({ data: user, message: "User profile data retrieved successfully!" });
+        const user = yield clients_1.default.user.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                email: true,
+                username: true,
+                name: true,
+                avatar: true,
+                soldTickets: true,
+                boughtTickets: true,
+                saves: true,
+                likes: true,
+                requests: true,
+                _count: {
+                    select: {
+                        followers: true,
+                        follows: true,
+                    },
+                },
+            },
+        });
+        return res.json({
+            data: user,
+            message: "User profile data retrieved successfully!",
+        });
     }
     catch (err) {
         console.error(err);
