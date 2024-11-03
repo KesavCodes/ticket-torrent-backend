@@ -62,7 +62,7 @@ model Request {
   name      String
   eventUrl  String
   status    String
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) 
 }
 
 model Ticket {

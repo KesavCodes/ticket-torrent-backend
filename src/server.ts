@@ -14,6 +14,7 @@ import eventsRouter from "./routes/event.route";
 import cityRouter from "./routes/city.route";
 import userRouter from "./routes/user.route";
 import ticketRouter from "./routes/ticket.route";
+import LikeRouter from "./routes/like.route";
 import requestRouter from "./routes/request.route";
 
 dotenv.config();
@@ -80,6 +81,7 @@ app.use("/events", eventsRouter);
 app.use("/city", cityRouter);
 app.use("/user", userRouter);
 app.use("/ticket", ticketRouter);
+app.use("/like", LikeRouter);
 app.use("/request", requestRouter);
 
 app.get("/", (req: Request, res: Response) =>

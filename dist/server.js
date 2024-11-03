@@ -16,6 +16,7 @@ const event_route_1 = __importDefault(require("./routes/event.route"));
 const city_route_1 = __importDefault(require("./routes/city.route"));
 const user_route_1 = __importDefault(require("./routes/user.route"));
 const ticket_route_1 = __importDefault(require("./routes/ticket.route"));
+const like_route_1 = __importDefault(require("./routes/like.route"));
 const request_route_1 = __importDefault(require("./routes/request.route"));
 dotenv_1.default.config();
 const requiredProperty = [
@@ -50,6 +51,7 @@ app.use("/events", event_route_1.default);
 app.use("/city", city_route_1.default);
 app.use("/user", user_route_1.default);
 app.use("/ticket", ticket_route_1.default);
+app.use("/like", like_route_1.default);
 app.use("/request", request_route_1.default);
 app.get("/", (req, res) => res.status(200).send("Welcome to Ticket Torrent Backend!"));
 app.listen(PORT, () => console.log(`listening on PORT: ${PORT}`));

@@ -1,9 +1,52 @@
 import { Request, Response } from "express";
 import prisma from "../lib/clients";
+import { Event, Ticket } from "@prisma/client";
+
+type EventRequiredFields = {
+  name: string;
+  id: string;
+  description: string;
+  cover: string;
+  date: Date;
+  city: {
+    id: string;
+    name: string;
+  };
+  address: string;
+  category: string;
+  hostedBy: string;
+  tags: string[];
+};
+
+type EventWithTickets = Event & {
+  tickets: Ticket[];
+};
+
+const likedEventsSet = async (
+  events: EventRequiredFields[] | EventWithTickets,
+  user?: Express.User
+) => {
+  let likedEvents: { eventId: string }[] = [];
+  if (user) {
+    likedEvents = await prisma.like.findMany({
+      where: {
+        userId: user.id,
+        eventId: Array.isArray(events)
+          ? { in: events.map((event) => event.id) }
+          : events.id,
+      },
+      select: {
+        eventId: true,
+      },
+    });
+  }
+  console.log(likedEvents, '---liked set')
+  return new Set(likedEvents.map((item) => item.eventId));
+};
 
 export const getAllEvents = async (req: Request, res: Response) => {
   try {
-    const events = await prisma.event.findMany({
+    let events = await prisma.event.findMany({
       select: {
         id: true,
         name: true,
@@ -11,8 +54,17 @@ export const getAllEvents = async (req: Request, res: Response) => {
         cover: true,
         city: true,
         date: true,
+        address: true,
+        category: true,
+        hostedBy: true,
+        tags: true,
       },
     });
+    const likedSet = await likedEventsSet(events, req.user);
+    events = events.map((event) => ({
+      ...event,
+      favorite: likedSet.has(event.id),
+    }));
     return res
       .status(200)
       .json({ data: events, message: "Events retrieved successfully!" });
@@ -28,8 +80,22 @@ export const getAllEvents = async (req: Request, res: Response) => {
 export const getEventById = async (req: Request, res: Response) => {
   const { eventId: id } = req.params;
   try {
-    const event = await prisma.event.findUnique({ where: { id }, include: {tickets: true} });
-    return res.json({ data: event, message: "Events retrieved successfully!" });
+    let event = await prisma.event.findUnique({
+      where: { id },
+      include: { tickets: true },
+    });
+    if (!event)
+      return res.status(404).json({
+        data: null,
+        message: "Not able to find the event!",
+      });
+    const likedSet = await likedEventsSet(event, req.user);
+    let eventWithFav = { ...event, favorite: likedSet.has(event.id) };
+
+    return res.json({
+      data: eventWithFav,
+      message: "Events retrieved successfully!",
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json({
@@ -40,8 +106,6 @@ export const getEventById = async (req: Request, res: Response) => {
 };
 
 export const getEventsBySearch = async (req: Request, res: Response) => {
-  const userId = req.user?.id;
-  console.log(userId, '----user id from event search')
   try {
     const { name, city, date, max } = req.query;
     const lowerDateRange = date
@@ -50,7 +114,7 @@ export const getEventsBySearch = async (req: Request, res: Response) => {
     const upperDateRange = date
       ? new Date(new Date(date.toString()).setUTCHours(23, 59, 59, 999))
       : undefined;
-    const eventsMatchingSearchCriteria = await prisma.event.findMany({
+    let eventsMatchingSearchCriteria = await prisma.event.findMany({
       where: {
         name: {
           contains: name ? name.toString() : undefined,
@@ -77,13 +141,19 @@ export const getEventsBySearch = async (req: Request, res: Response) => {
         address: true,
         category: true,
         hostedBy: true,
-        tags: true
+        tags: true,
       },
       orderBy: {
         createdAt: "desc",
       },
       ...(max && typeof Number(max) === "number" ? { take: Number(max) } : {}),
     });
+
+    const likedSet = await likedEventsSet(eventsMatchingSearchCriteria, req.user);
+    eventsMatchingSearchCriteria = eventsMatchingSearchCriteria.map((event) => ({
+      ...event,
+      favorite: likedSet.has(event.id),
+    }));
 
     return res.json({
       data: eventsMatchingSearchCriteria,

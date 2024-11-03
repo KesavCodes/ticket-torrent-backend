@@ -32,11 +32,17 @@ export const getMyProfileDetail = async (req: Request, res: Response) => {
         username: true,
         name: true,
         avatar: true,
-        soldTickets: true,
-        boughtTickets: true,
+        // soldTickets: true,
+        // boughtTickets: true,
         saves: true,
-        likes: true,
+        likes: {
+          select: {
+            id: true,
+            eventId: true,
+          }
+        },
         requests: true,
+        tickets: true,
         _count: {
           select: {
             followers: true,

@@ -14,9 +14,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteEvent = exports.updateEvent = exports.addEvent = exports.getEventsBySearch = exports.getEventById = exports.getAllEvents = void 0;
 const clients_1 = __importDefault(require("../lib/clients"));
+const likedEventsSet = (events, user) => __awaiter(void 0, void 0, void 0, function* () {
+    let likedEvents = [];
+    if (user) {
+        likedEvents = yield clients_1.default.like.findMany({
+            where: {
+                userId: user.id,
+                eventId: Array.isArray(events)
+                    ? { in: events.map((event) => event.id) }
+                    : events.id,
+            },
+            select: {
+                eventId: true,
+            },
+        });
+    }
+    console.log(likedEvents, '---liked set');
+    return new Set(likedEvents.map((item) => item.eventId));
+});
 const getAllEvents = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const events = yield clients_1.default.event.findMany({
+        let events = yield clients_1.default.event.findMany({
             select: {
                 id: true,
                 name: true,
@@ -24,8 +42,14 @@ const getAllEvents = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 cover: true,
                 city: true,
                 date: true,
+                address: true,
+                category: true,
+                hostedBy: true,
+                tags: true,
             },
         });
+        const likedSet = yield likedEventsSet(events, req.user);
+        events = events.map((event) => (Object.assign(Object.assign({}, event), { favorite: likedSet.has(event.id) })));
         return res
             .status(200)
             .json({ data: events, message: "Events retrieved successfully!" });
@@ -42,8 +66,21 @@ exports.getAllEvents = getAllEvents;
 const getEventById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { eventId: id } = req.params;
     try {
-        const event = yield clients_1.default.event.findUnique({ where: { id }, include: { tickets: true } });
-        return res.json({ data: event, message: "Events retrieved successfully!" });
+        let event = yield clients_1.default.event.findUnique({
+            where: { id },
+            include: { tickets: true },
+        });
+        if (!event)
+            return res.status(404).json({
+                data: null,
+                message: "Not able to find the event!",
+            });
+        const likedSet = yield likedEventsSet(event, req.user);
+        let eventWithFav = Object.assign(Object.assign({}, event), { favorite: likedSet.has(event.id) });
+        return res.json({
+            data: eventWithFav,
+            message: "Events retrieved successfully!",
+        });
     }
     catch (err) {
         console.error(err);
@@ -55,9 +92,6 @@ const getEventById = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 });
 exports.getEventById = getEventById;
 const getEventsBySearch = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
-    console.log(userId, '----user id from event search');
     try {
         const { name, city, date, max } = req.query;
         const lowerDateRange = date
@@ -66,7 +100,7 @@ const getEventsBySearch = (req, res) => __awaiter(void 0, void 0, void 0, functi
         const upperDateRange = date
             ? new Date(new Date(date.toString()).setUTCHours(23, 59, 59, 999))
             : undefined;
-        const eventsMatchingSearchCriteria = yield clients_1.default.event.findMany(Object.assign({ where: {
+        let eventsMatchingSearchCriteria = yield clients_1.default.event.findMany(Object.assign({ where: {
                 name: {
                     contains: name ? name.toString() : undefined,
                     mode: "insensitive",
@@ -91,10 +125,12 @@ const getEventsBySearch = (req, res) => __awaiter(void 0, void 0, void 0, functi
                 address: true,
                 category: true,
                 hostedBy: true,
-                tags: true
+                tags: true,
             }, orderBy: {
                 createdAt: "desc",
             } }, (max && typeof Number(max) === "number" ? { take: Number(max) } : {})));
+        const likedSet = yield likedEventsSet(eventsMatchingSearchCriteria, req.user);
+        eventsMatchingSearchCriteria = eventsMatchingSearchCriteria.map((event) => (Object.assign(Object.assign({}, event), { favorite: likedSet.has(event.id) })));
         return res.json({
             data: eventsMatchingSearchCriteria,
             message: "Events retrieved successfully!",
