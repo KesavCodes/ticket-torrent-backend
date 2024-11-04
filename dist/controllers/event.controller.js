@@ -29,7 +29,7 @@ const likedEventsSet = (events, user) => __awaiter(void 0, void 0, void 0, funct
             },
         });
     }
-    console.log(likedEvents, '---liked set');
+    console.log(likedEvents, "---liked set");
     return new Set(likedEvents.map((item) => item.eventId));
 });
 const getAllEvents = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -186,8 +186,9 @@ exports.addEvent = addEvent;
 const updateEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
-    const { name, description, date, cityId } = req.body;
+    const { name, description, date, cityId, address, hostedBy, category, tags, cover, } = req.body;
     const { id } = req.params;
+    console.log(tags, '---tags');
     try {
         const checkEvent = yield clients_1.default.event.findUnique({ where: { id, userId } });
         if (!checkEvent)
@@ -198,6 +199,11 @@ const updateEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 userId,
                 name,
                 description,
+                address,
+                hostedBy,
+                category,
+                cover,
+                tags: tags,
                 date: new Date(date),
                 dateTime: new Date(date),
                 cityId,
@@ -221,10 +227,16 @@ const deleteEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     var _a;
     const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
     const { id } = req.params;
+    if (!userId)
+        return res
+            .status(401)
+            .json({ data: null, message: "User not authenticated." });
     try {
         const checkEvent = yield clients_1.default.event.findUnique({ where: { id, userId } });
         if (!checkEvent)
-            return res.status(401).json({ message: "Event not belong to the user." });
+            return res
+                .status(401)
+                .json({ data: null, message: "Event not belong to the user." });
         const deletedEvent = yield clients_1.default.event.delete({ where: { id } });
         return res
             .status(200)

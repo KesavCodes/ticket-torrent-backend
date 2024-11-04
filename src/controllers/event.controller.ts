@@ -40,7 +40,7 @@ const likedEventsSet = async (
       },
     });
   }
-  console.log(likedEvents, '---liked set')
+  console.log(likedEvents, "---liked set");
   return new Set(likedEvents.map((item) => item.eventId));
 };
 
@@ -149,11 +149,16 @@ export const getEventsBySearch = async (req: Request, res: Response) => {
       ...(max && typeof Number(max) === "number" ? { take: Number(max) } : {}),
     });
 
-    const likedSet = await likedEventsSet(eventsMatchingSearchCriteria, req.user);
-    eventsMatchingSearchCriteria = eventsMatchingSearchCriteria.map((event) => ({
-      ...event,
-      favorite: likedSet.has(event.id),
-    }));
+    const likedSet = await likedEventsSet(
+      eventsMatchingSearchCriteria,
+      req.user
+    );
+    eventsMatchingSearchCriteria = eventsMatchingSearchCriteria.map(
+      (event) => ({
+        ...event,
+        favorite: likedSet.has(event.id),
+      })
+    );
 
     return res.json({
       data: eventsMatchingSearchCriteria,
@@ -216,7 +221,17 @@ export const addEvent = async (req: Request, res: Response) => {
 
 export const updateEvent = async (req: Request, res: Response) => {
   const userId = req.user?.id;
-  const { name, description, date, cityId } = req.body;
+  const {
+    name,
+    description,
+    date,
+    cityId,
+    address,
+    hostedBy,
+    category,
+    tags,
+    cover,
+  } = req.body;
   const { id } = req.params;
   try {
     const checkEvent = await prisma.event.findUnique({ where: { id, userId } });
@@ -228,6 +243,11 @@ export const updateEvent = async (req: Request, res: Response) => {
         userId,
         name,
         description,
+        address,
+        hostedBy,
+        category,
+        cover,
+        tags,
         date: new Date(date),
         dateTime: new Date(date),
         cityId,
@@ -249,10 +269,16 @@ export const updateEvent = async (req: Request, res: Response) => {
 export const deleteEvent = async (req: Request, res: Response) => {
   const userId = req.user?.id;
   const { id } = req.params;
+  if (!userId)
+    return res
+      .status(401)
+      .json({ data: null, message: "User not authenticated." });
   try {
     const checkEvent = await prisma.event.findUnique({ where: { id, userId } });
     if (!checkEvent)
-      return res.status(401).json({ message: "Event not belong to the user." });
+      return res
+        .status(401)
+        .json({ data: null, message: "Event not belong to the user." });
     const deletedEvent = await prisma.event.delete({ where: { id } });
     return res
       .status(200)

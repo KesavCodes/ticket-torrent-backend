@@ -35,7 +35,7 @@ model Event {
   cover       String
   date        DateTime @db.Date
   dateTime    DateTime
-  city        City     @relation(fields: [cityId], references: [id])
+  city        City     @relation(fields: [cityId], references: [id], onDelete: Cascade)
   cityId      String   @db.ObjectId
   address     String
   category    String
@@ -45,7 +45,7 @@ model Event {
   likes       Like[]
   hostedBy    String
   createdAt   DateTime @default(now())
-  user        User     @relation(fields: [userId], references: [id])
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      String   @db.ObjectId
 }
 
@@ -57,7 +57,7 @@ model City {
 
 model Request {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String   @db.ObjectId
   name      String
   eventUrl  String
@@ -67,9 +67,9 @@ model Request {
 
 model Ticket {
   id           String        @id @default(auto()) @map("_id") @db.ObjectId
-  event        Event         @relation(fields: [eventId], references: [id])
+  event        Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
   eventId      String        @db.ObjectId
-  user         User          @relation(fields: [userId], references: [id])
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       String        @db.ObjectId
   price        Float
   quantity     Int
@@ -81,11 +81,11 @@ model Ticket {
 
 model Transaction {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  ticket    Ticket   @relation(fields: [ticketId], references: [id])
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
   ticketId  String   @db.ObjectId
-  seller    User     @relation("tickets sold", fields: [buyerId], references: [id])
+  seller    User     @relation("tickets sold", fields: [buyerId], references: [id], onDelete: Cascade)
   sellerId  String   @db.ObjectId
-  buyer     User     @relation("tickets bought", fields: [buyerId], references: [id])
+  buyer     User     @relation("tickets bought", fields: [buyerId], references: [id], onDelete: Cascade)
   buyerId   String   @db.ObjectId
   amount    Float
   status    String
@@ -94,27 +94,27 @@ model Transaction {
 
 model Save {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String   @db.ObjectId
-  event     Event    @relation(fields: [eventId], references: [id])
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
   eventId   String   @db.ObjectId
   createdAt DateTime @default(now())
 }
 
 model Follow {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  follower    User     @relation("Follower", fields: [followerId], references: [id])
+  follower    User     @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
   followerId  String   @db.ObjectId
-  following   User     @relation("Following", fields: [followingId], references: [id])
+  following   User     @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
   followingId String   @db.ObjectId
   createdAt   DateTime @default(now())
 }
 
 model Like {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String   @db.ObjectId
-  event     Event    @relation(fields: [eventId], references: [id])
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
   eventId   String   @db.ObjectId
   createdAt DateTime @default(now())
 }
