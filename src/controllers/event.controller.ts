@@ -107,7 +107,7 @@ export const getEventById = async (req: Request, res: Response) => {
 
 export const getEventsBySearch = async (req: Request, res: Response) => {
   try {
-    const { name, city, date, max } = req.query;
+    const { name, cityId, date, max } = req.query;
     const lowerDateRange = date
       ? new Date(new Date(date.toString()).setUTCHours(0, 0, 0, 0))
       : undefined;
@@ -120,16 +120,11 @@ export const getEventsBySearch = async (req: Request, res: Response) => {
           contains: name ? name.toString() : undefined,
           mode: "insensitive",
         },
-        city: {
-          name: {
-            contains: city ? city.toString() : undefined,
-            mode: "insensitive",
-          },
-        },
         date: {
           gte: lowerDateRange,
           lte: upperDateRange,
         },
+        ...(cityId ? { cityId: cityId.toString() } : {}),
       },
       select: {
         id: true,

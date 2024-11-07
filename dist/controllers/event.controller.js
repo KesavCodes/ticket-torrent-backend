@@ -93,29 +93,20 @@ const getEventById = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 exports.getEventById = getEventById;
 const getEventsBySearch = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { name, city, date, max } = req.query;
+        const { name, cityId, date, max } = req.query;
         const lowerDateRange = date
             ? new Date(new Date(date.toString()).setUTCHours(0, 0, 0, 0))
             : undefined;
         const upperDateRange = date
             ? new Date(new Date(date.toString()).setUTCHours(23, 59, 59, 999))
             : undefined;
-        let eventsMatchingSearchCriteria = yield clients_1.default.event.findMany(Object.assign({ where: {
-                name: {
+        let eventsMatchingSearchCriteria = yield clients_1.default.event.findMany(Object.assign({ where: Object.assign({ name: {
                     contains: name ? name.toString() : undefined,
                     mode: "insensitive",
-                },
-                city: {
-                    name: {
-                        contains: city ? city.toString() : undefined,
-                        mode: "insensitive",
-                    },
-                },
-                date: {
+                }, date: {
                     gte: lowerDateRange,
                     lte: upperDateRange,
-                },
-            }, select: {
+                } }, (cityId ? { cityId: cityId.toString() } : {})), select: {
                 id: true,
                 name: true,
                 description: true,
@@ -188,7 +179,6 @@ const updateEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
     const { name, description, date, cityId, address, hostedBy, category, tags, cover, } = req.body;
     const { id } = req.params;
-    console.log(tags, '---tags');
     try {
         const checkEvent = yield clients_1.default.event.findUnique({ where: { id, userId } });
         if (!checkEvent)
@@ -203,7 +193,7 @@ const updateEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 hostedBy,
                 category,
                 cover,
-                tags: tags,
+                tags,
                 date: new Date(date),
                 dateTime: new Date(date),
                 cityId,
