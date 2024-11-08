@@ -39,7 +39,7 @@ export const getMyProfileDetail = async (req: Request, res: Response) => {
           select: {
             id: true,
             eventId: true,
-          }
+          },
         },
         requests: true,
         tickets: true,
@@ -67,7 +67,17 @@ export const getMyProfileDetail = async (req: Request, res: Response) => {
 export const getUserById = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const user = await prisma.user.findUnique({ where: { id } });
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        name: true,
+        avatar: true,
+        phone: true,
+      },
+    });
     return res.json({ data: user, message: "User retrieved successfully!" });
   } catch (err) {
     console.error(err);

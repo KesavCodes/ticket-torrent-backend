@@ -54,7 +54,7 @@ const getMyProfileDetail = (req, res) => __awaiter(void 0, void 0, void 0, funct
                     select: {
                         id: true,
                         eventId: true,
-                    }
+                    },
                 },
                 requests: true,
                 tickets: true,
@@ -83,7 +83,17 @@ exports.getMyProfileDetail = getMyProfileDetail;
 const getUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     try {
-        const user = yield clients_1.default.user.findUnique({ where: { id } });
+        const user = yield clients_1.default.user.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                email: true,
+                username: true,
+                name: true,
+                avatar: true,
+                phone: true,
+            },
+        });
         return res.json({ data: user, message: "User retrieved successfully!" });
     }
     catch (err) {

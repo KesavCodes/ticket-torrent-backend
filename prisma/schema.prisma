@@ -16,6 +16,7 @@ model User {
   oauthProvider String?
   oauthId       String?
   name          String?
+  phone         String?
   createdAt     DateTime      @default(now())
   events        Event[]
   tickets       Ticket[]
@@ -62,7 +63,7 @@ model Request {
   name      String
   eventUrl  String
   status    String
-  createdAt DateTime @default(now()) 
+  createdAt DateTime @default(now())
 }
 
 model Ticket {
