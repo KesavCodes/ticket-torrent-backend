@@ -53,7 +53,22 @@ const getMyProfileDetail = (req, res) => __awaiter(void 0, void 0, void 0, funct
                 likes: {
                     select: {
                         id: true,
-                        eventId: true,
+                        event: {
+                            select: {
+                                id: true,
+                                name: true,
+                                description: true,
+                                cover: true,
+                                date: true,
+                                address: true,
+                                category: true,
+                                city: {
+                                    select: {
+                                        name: true,
+                                    }
+                                }
+                            },
+                        },
                     },
                 },
                 requests: true,

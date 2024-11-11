@@ -38,9 +38,24 @@ export const getMyProfileDetail = async (req: Request, res: Response) => {
         likes: {
           select: {
             id: true,
-            eventId: true,
+            event: {
+              select: {
+                id: true,
+                name: true,
+                description: true,
+                cover: true,
+                date: true,
+                address: true,
+                category: true,
+                city: {
+                  select: {
+                    name: true,
+                  }
+                }
+              },
+            },
           },
-        },
+        }, 
         requests: true,
         tickets: true,
         _count: {
