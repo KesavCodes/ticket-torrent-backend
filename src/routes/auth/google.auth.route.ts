@@ -9,20 +9,20 @@ router.get("/login", passport.authenticate("google"));
 router.get(
   "/callback",
   passport.authenticate("google", {
-    successRedirect: "/google/success",
-    failureRedirect: "/google/failure",
+    successRedirect: "success",
+    failureRedirect: "failure",
     session: true,
   })
 );
 
-router.get("/google/success", (req: Request, res: Response) => {
+router.get("/success", (req: Request, res: Response) => {
   console.log(req.user, "-- From: req.user");
   return res
     .status(200)
     .json({ message: "User Logged in successfully", user: req.user?.id });
 });
 
-router.get("/google/failure", (req: Request, res: Response) => {
+router.get("/failure", (req: Request, res: Response) => {
   return res.status(400).send("Login failed. Try again!");
 });
 

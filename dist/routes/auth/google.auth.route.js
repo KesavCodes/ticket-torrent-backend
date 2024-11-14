@@ -9,18 +9,18 @@ require("../../strategies/googleStrategy");
 const router = express_1.default.Router();
 router.get("/login", passport_1.default.authenticate("google"));
 router.get("/callback", passport_1.default.authenticate("google", {
-    successRedirect: "/google/success",
-    failureRedirect: "/google/failure",
+    successRedirect: "success",
+    failureRedirect: "failure",
     session: true,
 }));
-router.get("/google/success", (req, res) => {
+router.get("/success", (req, res) => {
     var _a;
     console.log(req.user, "-- From: req.user");
     return res
         .status(200)
         .json({ message: "User Logged in successfully", user: (_a = req.user) === null || _a === void 0 ? void 0 : _a.id });
 });
-router.get("/google/failure", (req, res) => {
+router.get("/failure", (req, res) => {
     return res.status(400).send("Login failed. Try again!");
 });
 exports.default = router;
